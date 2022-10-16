@@ -1,31 +1,29 @@
 #include "main.h"
-#include <stddef.h>
 /**
-* get_spec_func - check specifier type and return function
-*@s: type to check
-*Return: pointer to function to use
+* get_flags - Calculates active flags
+* @format: Formatted string in which to print the arguments
+* @i: take a parameter.
+* Return: Flags:
 */
-char *(*get_spec_func(char s))(va_list)
+int get_flags(const char *format, int *i)
 {
-int i;
-s_types spec_types[] = {
-{"c", char_find},
-{"s", string_find},
-{"%", percent_find},
-{"d", int_find},
-{"i", int_find},
-{"u", unsigned_find},
-{"o", octal_find},
-{"r", rev_find},
-{"R", rot13_find},
-{"b", binary_find},
-{"x", hex_find},
-{"X", HEX_find},
-{"p", address_find},
-{NULL, NULL}
-};
-for (i = 0; spec_types[i].spec; i++)
-if (s == *spec_types[i].spec)
-return (spec_types[i].f);
-return (spec_types[i].f);
+/* - + 0 # ' ' */
+/* 1 2 4 8  16 */
+int j, curr_i;
+int flags = 0;
+const char FLAGS_CH[] = {'-', '+', '0', '#', ' ', '\0'};
+const int FLAGS_ARR[] = {F_MINUS, F_PLUS, F_ZERO, F_HASH, F_SPACE, 0};
+for (curr_i = *i + 1; format[curr_i] != '\0'; curr_i++)
+{
+for (j = 0; FLAGS_CH[j] != '\0'; j++)
+if (format[curr_i] == FLAGS_CH[j])
+{
+flags |= FLAGS_ARR[j];
+break;
+}
+if (FLAGS_CH[j] == 0)
+break;
+}
+*i = curr_i - 1;
+return (flags);
 }
